@@ -1,0 +1,168 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family:  "Nanum Gothic", serif;
+
+}
+
+
+
+
+body {
+  background-color: #ffffff;
+  padding: 20px;
+  position: relative;
+}
+
+.main {
+  display: flex;
+  border:  1px solid gray;
+  flex-direction: row;
+  justify-content: end;
+  width: 80%;
+  margin: auto;
+  padding: 15px;
+  z-index: 1;
+}
+  
+
+.mainContainer {
+  border: 1px solid #ff5e5e;
+  height: 100%;
+  width: 70%;
+  padding: 10px;
+  background: #fff;
+  border-radius: 5px;
+}
+
+.editable {
+  outline: none;
+  width: 100%;
+  min-height: 30px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+  font-size: 14px;
+  transition: border 0.2s ease-in-out;
+}
+
+.editable:focus {
+  border-color: #007bff;
+}
+
+.editable:empty::before,
+.title:empty:before,
+.author:empty:before {
+  content: attr(data-placeholder);
+  color: gray;
+  font-weight: light;
+  pointer-events: none;
+}
+
+.editable[data-placeholder-visible]::before {
+  content: attr(data-placeholder);
+  color: #aaa; 
+  pointer-events: none; 
+}
+
+
+.textContainer {
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.textContainer:hover {
+  background-color: #f9f9f9;
+}
+
+.no-before:empty::before {
+  display: none;
+}
+
+.itemsFunc {
+  display: inline-block;
+  border: 1px solid #ff5e5e;
+  min-height: 20px;
+  padding: 5px 10px;
+  font-size: 12px;
+  background: #ffe5e5;
+  color: #d9534f;
+  position: absolute;
+  z-index: -3;
+  transition: all 0.25s ease-in-out;
+  border-radius: 4px;
+}
+
+.buttonsContainer {
+  border: 1px solid green;
+  flex-basis: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 5px;
+  gap: 10px;
+}
+
+button {
+  padding: 8px 15px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.save {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.publish {
+  background-color: #28a745;
+  color: white;
+}
+
+.save:hover {
+  background-color: #e0a800;
+}
+
+.publish:hover {
+  background-color: #218838;
+}
+
+.hide {
+  display: none;
+}
+
+
+.title,
+.author {
+  outline: none;
+  font-weight: 300;
+}
+
+.none {
+  display: none;
+}
+
+
+
+.header {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  gap: 5px;
+}
+
+.titleCon, 
+.authorCon {
+  display: flex;
+
+}
