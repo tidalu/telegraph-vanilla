@@ -9,7 +9,7 @@ const authorFunc = document.querySelector('.authorBef')
 
 
 const templateElement = `<div class='textContainer'>
-<div class="editable" contenteditable=true  data-placeholder="Type here..."></div>
+<div class="editable blinking-caret" dir='auto' contenteditable=true  data-placeholder="Type here..."></div>
 </div>`
 
 function addEventListeners(container) {
@@ -21,6 +21,7 @@ function addEventListeners(container) {
   const editable = container.querySelector('.editable');
   let caretPosition = null;
   const placeholder = editable.getAttribute('data-placeholder')
+  let innerLength = 0; 
 
 
   editable.setAttribute("contenteditable", "true");
@@ -29,6 +30,7 @@ function addEventListeners(container) {
     saveButton.addEventListener('click', () => {
       editable.setAttribute("contenteditable", "true");
       editable.focus();
+      caretUtils(editable).setCaret()
       saveButton.classList.toggle('hide');
       publishButton.classList.toggle('hide');
     });
@@ -42,6 +44,7 @@ function addEventListeners(container) {
 
   editable.addEventListener('focus', () => {
     if(editable.textContent.trim().length >= 1) {
+      
       editable.removeAttribute('data-placeholder-visible');
     }
     if (saveButton.classList.contains('hide')) {
@@ -52,7 +55,9 @@ function addEventListeners(container) {
 
     }
   });
-
+  editable.addEventListener('input', (e) => {
+    innerLength = editable.textContent - 1
+  })
 
   editable.addEventListener('keyup', () => {
     caretPosition = caretUtils(editable).getCaret()
@@ -63,12 +68,15 @@ function addEventListeners(container) {
     togglePlaceholder(editable)
   });
 
+
+
   editable.addEventListener('keydown', (e) => {
     if (e.code === 'Enter') {
       e.preventDefault();
       const nextElement = container.nextElementSibling;
       if (nextElement) {
         nextElement.querySelector('.editable').focus();
+        caretUtils(nextElement).setCaret(nextElement)
       } else {
         addNewTextContainer();
 
@@ -79,20 +87,24 @@ function addEventListeners(container) {
       const prevElement = container.previousElementSibling;
       if (prevElement && prevElement.classList.contains('textContainer')) {
         prevElement.querySelector('.editable').focus();
+        caretUtils(prevElement).setCaret(prevElement) 
         e.target.parentNode.remove()
       } else {
         return
       }
     } else if (e.code === 'Backspace' && caretPosition === 0) {
       const prevElement = container.previousElementSibling;
+      console.log(prevElement.childNodes)
       if (prevElement && prevElement.classList.contains('textContainer')) {
         prevElement.querySelector('.editable').focus();
+        caretUtils(prevElement).setCaret(prevElement)
       }
     }
   });
 
-  editable.addEventListener('input', () => {
+  editable.addEventListener('input', (e) => {
     togglePlaceholder(editable);
+    innerLength = e.target.innerText - 1
   });
 
 
@@ -110,12 +122,14 @@ function addEventListeners(container) {
 
 
   function togglePlaceholder(editable) {
-    if (!editable.textContent.trim()) {
-      editable.setAttribute('data-placeholder-visible', true)
-  
-    } else {
-      editable.removeAttribute('data-placeholder-visible')
-    }
+    
+      if (!editable.textContent.trim()) {
+        editable.setAttribute('data-placeholder-visible', true)
+        
+      } else {
+        editable.removeAttribute('data-placeholder-visible')
+      }
+    
   }
 
   updateItemsFuncPosition();
@@ -124,6 +138,88 @@ function addEventListeners(container) {
 
 }
 
+
+function modifHeader(container) {
+  const saveButton = document.querySelector('.save');
+  const publishButton = document.querySelector('.publish');
+  const mainContainer = document.querySelector('.mainContainer')
+  const main = document.querySelector('.main')
+  const header = document.querySelector('.header');
+  
+  
+  const editHeader = container.querySelector('.editHeader');
+  
+  let caretPosition = null;
+
+  editHeader.setAttribute("contenteditable", "true");
+
+  if (saveButton && publishButton) {
+    saveButton.addEventListener('click', () => {
+      editHeader.setAttribute("contenteditable", "true");
+      saveButton.classList.toggle('hide');
+      publishButton.classList.toggle('hide');
+    });
+
+    publishButton.addEventListener('click', () => {
+      editHeader.setAttribute("contenteditable", "false");
+      saveButton.classList.toggle('hide');
+      publishButton.classList.toggle('hide');
+    });
+  }
+
+  editHeader.addEventListener('input', () => {
+    if(editHeader.textContent.trim().length > 0) {
+      editHeader.removeAttribute('data-placeholder-visible');
+    } else {
+      togglePlaceholder(editHeader)
+    }
+  });
+
+
+  editHeader.addEventListener('keyup', () => {
+    caretPosition = caretUtils(editHeader).getCaret()
+  })
+
+  editHeader.addEventListener('blur', () => {
+    togglePlaceholder(editHeader)
+  });
+
+  editHeader.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter') {
+      e.preventDefault();
+      const nextElement = container.nextElementSibling;
+      if (nextElement) {
+        nextElement.querySelector('.editHeader').focus();
+      } 
+    }
+
+    if (e.code === 'Backspace') {
+      const prevElement = container.previousElementSibling;
+      if (prevElement?.classList.contains('topics')) {
+        if (e.target.textContent.trim().length === 0 || caretPosition === 0) {
+          prevElement.querySelector('.editHeader').focus();
+          moveCaretToEnd(prevElement);
+        }
+      }
+    }
+    
+  });
+
+  editHeader.addEventListener('select', (e) => {
+    // nothing
+  })
+
+  function togglePlaceholder(editable) {
+    if (!editable.textContent.trim()) {
+      editable.setAttribute('data-placeholder-visible', true)
+  
+    } else {
+      editable.removeAttribute('data-placeholder-visible')
+    }
+  }
+  togglePlaceholder(editHeader)
+
+}
 
 
 
@@ -136,7 +232,6 @@ function addNewTextContainer() {
   editable.classList.add('no-before')
 }
 
-
 function getPosition(element) {
   var rect = element.getBoundingClientRect();
   return {
@@ -144,7 +239,6 @@ function getPosition(element) {
     y: rect.top
   };
 }
-
 
 function caretUtils(editable) {
   return {
@@ -157,13 +251,26 @@ function caretUtils(editable) {
       preCaretRange.selectNodeContents(editable);
       preCaretRange.setEnd(range.endContainer, range.endOffset);
 
-      return preCaretRange.toString().length; // Caret position
+      return preCaretRange.toString().length; 
     },
 
-
+    setCaret: function () {
+      // const range = document.createRange();
+      //   const selection = window.getSelection();
+      //   range.setStart(editable, editable.childNodes.length);
+      //   range.collapse(true);
+      //   selection.removeAllRanges();
+      //   selection.addRange(range);
+        console.log('we have not solved this yet')
+      
+      
+    },
   };
 }
 
 
 
+
+
 document.querySelectorAll('.textContainer').forEach(addEventListeners);
+document.querySelectorAll('.topics').forEach(modifHeader)

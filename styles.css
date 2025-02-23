@@ -3,7 +3,6 @@
   margin: 0;
   padding: 0;
   font-family:  "Nanum Gothic", serif;
-
 }
 
 
@@ -11,34 +10,41 @@
 
 body {
   background-color: #ffffff;
-  padding: 20px;
   position: relative;
+}
+
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .main {
   display: flex;
-  border:  1px solid gray;
+
   flex-direction: row;
   justify-content: end;
-  width: 80%;
+  flex-grow: 1;
+  width: 100%;
+  max-width: 732px;
   margin: auto;
-  padding: 15px;
+  padding: 21px 0;
   z-index: 1;
+
+
 }
   
 
 .mainContainer {
-  border: 1px solid #ff5e5e;
-  height: 100%;
-  width: 70%;
-  padding: 10px;
-  background: #fff;
-  border-radius: 5px;
+  flex-grow: 1;
+  max-width: 732px; /* Ensures it doesn’t stretch indefinitely */
+  min-width: 300px; /* Prevents it from being too small */
+
+  
 }
 
 .editable {
   outline: none;
-  width: 100%;
   min-height: 30px;
   padding: 8px;
   border: 1px solid #ccc;
@@ -46,7 +52,21 @@ body {
   background: white;
   font-size: 14px;
   transition: border 0.2s ease-in-out;
+  
 }
+
+
+.title, 
+.author {
+  outline: none;
+  display: block;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  max-width: calc(100% - 42px);
+  width: 100%;
+}
+
 
 .editable:focus {
   border-color: #007bff;
@@ -56,12 +76,13 @@ body {
 .title:empty:before,
 .author:empty:before {
   content: attr(data-placeholder);
-  color: gray;
+  color: #aaa;
   font-weight: light;
   pointer-events: none;
 }
 
-.editable[data-placeholder-visible]::before {
+.editable[data-placeholder-visible]::before, 
+.editHeader[data-placeholder-visible]::before {
   content: attr(data-placeholder);
   color: #aaa; 
   pointer-events: none; 
@@ -76,6 +97,10 @@ body {
   border-radius: 5px;
   transition: all 0.3s ease;
   z-index: 2;
+  flex-shrink: 1;
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .textContainer:hover {
@@ -96,18 +121,60 @@ body {
   color: #d9534f;
   position: absolute;
   z-index: -3;
-  transition: all 0.25s ease-in-out;
+ 
   border-radius: 4px;
 }
 
+.placeholderHeader {
+  display: inline-block;
+  position: absolute;
+  z-index: 0;
+  
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+  transition: opacity 0.15s linear;
+}
+
+
+
+.title:not(:empty):after {
+  content: 'Title';
+  position: absolute;
+  font-weight: 200;
+  height: 50%;
+  width: auto;
+  padding: 9px 12px;
+  margin: 0 21px;
+  left: -21px;
+  top: 15px;
+  border-right: 2px solid rgba(0, 0, 0, 0.15);
+  transform: translate(-100%, 0%);
+  color: rgba(0, 0, 0, 0.15);
+}
+
+.author:not(:empty)::after {
+  content: 'Author';
+  position: absolute;
+  height: 50%;
+  width: auto;
+  padding: 9px 12px;
+  margin: 0 21px;
+  left: -21px;
+  top: 0;
+  border-right: 2px solid rgba(0, 0, 0, 0.15);
+  transform: translate(-100%, 0%);
+  color: rgba(0, 0, 0, 0.15);
+}
+
+.no-after::after {
+  display: none;
+}
+
 .buttonsContainer {
-  border: 1px solid green;
-  flex-basis: 10%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 5px;
-  gap: 10px;
+    position: fixed;
+    left: 50%;
+    top: 0;
+    right: 0;
+    margin: 46px 0 0 376px
 }
 
 button {
@@ -117,6 +184,10 @@ button {
   cursor: pointer;
   border-radius: 5px;
   transition: all 0.3s ease;
+}
+
+.border {
+  border : 1px solid gray;
 }
 
 .save {
@@ -142,11 +213,20 @@ button {
 }
 
 
-.title,
-.author {
-  outline: none;
-  font-weight: 300;
+.title {
+  display: block;
+  font-weight: 700;
+  font-size: 32px;
+  margin: 21px 21px 11px 21px; /* Restore your margins */
+  line-height: 34px;
+  padding: 0;
+  
 }
+.author {
+  margin: 0px 21px 12px ;
+  padding: 0;
+}
+
 
 .none {
   display: none;
@@ -155,14 +235,46 @@ button {
 
 
 .header {
+  position: relative;
   display: flex;
   flex-direction: column;
-  padding: 5px;
-  gap: 5px;
+  flex: 0 1 auto;
 }
 
-.titleCon, 
-.authorCon {
+.topics {
+  position: relative;
   display: flex;
-
+  width: 100%;
 }
+
+
+
+@keyframes blink-caret {
+  50% {
+    caret-color: transparent; 
+  }
+}
+
+.blinking-caret {
+  animation: blink-caret 1s step-end infinite;
+}
+
+.account {
+  font-size: 15px;
+  line-height: 18px;
+  color: #000;
+  margin: 0 0 15px;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 960px) {
+  .buttonsContainer {
+      position:static;
+      width: auto;
+      margin: 30px 21px;
+      padding: 1px 0
+  }
+}
+
+
+
