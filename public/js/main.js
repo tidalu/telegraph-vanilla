@@ -1,16 +1,14 @@
 const title = document.querySelector('.title')
-const titleFunc = document.querySelector('.titleBef')
 const author = document.querySelector('.author')
-const authorFunc = document.querySelector('.authorBef')
 
 
 
 
 
 
-const templateElement = `<div class='textContainer'>
-<div class="editable blinking-caret" dir='auto' contenteditable=true  data-placeholder="Type here..."></div>
-</div>`
+const templateElement = `
+<div class="editable" dir='auto' contenteditable=true  ></div>
+`
 
 function addEventListeners(container) {
   const saveButton = document.querySelector('.save');
@@ -18,7 +16,7 @@ function addEventListeners(container) {
   const itemsFunc = document.querySelector('.itemsFunc');
   const main = document.querySelector('.main')
   const mainContainer = document.querySelector('.mainContainer')
-  const editable = container.querySelector('.editable');
+  const editable = container;
   let caretPosition = null;
   const placeholder = editable.getAttribute('data-placeholder')
   let innerLength = 0; 
@@ -30,7 +28,7 @@ function addEventListeners(container) {
     saveButton.addEventListener('click', () => {
       editable.setAttribute("contenteditable", "true");
       editable.focus();
-      caretUtils(editable).setCaret()
+      // caretUtils(editable).setCaret()
       saveButton.classList.toggle('hide');
       publishButton.classList.toggle('hide');
     });
@@ -75,8 +73,8 @@ function addEventListeners(container) {
       e.preventDefault();
       const nextElement = container.nextElementSibling;
       if (nextElement) {
-        nextElement.querySelector('.editable').focus();
-        caretUtils(nextElement).setCaret(nextElement)
+        nextElement.focus();
+        // caretUtils(nextElement).setCaret(nextElement)
       } else {
         addNewTextContainer();
 
@@ -85,19 +83,18 @@ function addEventListeners(container) {
 
     if (e.code === 'Backspace' && e.target.textContent.trim().length === 0) {
       const prevElement = container.previousElementSibling;
-      if (prevElement && prevElement.classList.contains('textContainer')) {
-        prevElement.querySelector('.editable').focus();
-        caretUtils(prevElement).setCaret(prevElement) 
-        e.target.parentNode.remove()
+      if (prevElement ) {
+        prevElement.focus();
+        // caretUtils(prevElement).setCaret(prevElement) 
+        if(prevElement.classList.contains('editable')) e.target.remove()
       } else {
         return
       }
     } else if (e.code === 'Backspace' && caretPosition === 0) {
       const prevElement = container.previousElementSibling;
-      console.log(prevElement.childNodes)
-      if (prevElement && prevElement.classList.contains('textContainer')) {
-        prevElement.querySelector('.editable').focus();
-        caretUtils(prevElement).setCaret(prevElement)
+      if (prevElement) {
+        prevElement.focus();
+        // caretUtils(prevElement).setCaret(prevElement)
       }
     }
   });
@@ -142,12 +139,8 @@ function addEventListeners(container) {
 function modifHeader(container) {
   const saveButton = document.querySelector('.save');
   const publishButton = document.querySelector('.publish');
-  const mainContainer = document.querySelector('.mainContainer')
-  const main = document.querySelector('.main')
-  const header = document.querySelector('.header');
   
-  
-  const editHeader = container.querySelector('.editHeader');
+  const editHeader = container
   
   let caretPosition = null;
 
@@ -167,13 +160,29 @@ function modifHeader(container) {
     });
   }
 
-  editHeader.addEventListener('input', () => {
-    if(editHeader.textContent.trim().length > 0) {
-      editHeader.removeAttribute('data-placeholder-visible');
+  editHeader.addEventListener('input', (e) => {
+    const isEmpty = editHeader.textContent.trim().length === 0;
+
+    if (!isEmpty) {
+        editHeader.removeAttribute('data-placeholder-visible');
     } else {
-      togglePlaceholder(editHeader)
+        togglePlaceholder(editHeader);
     }
-  });
+
+    editHeader.style.setProperty('--display-pseudo', isEmpty ? 'none' : 'inline');
+});
+
+editHeader.addEventListener('focus', (e) => {
+  if(e.target.textContent.trim().length > 0) {
+    e.target.style.setProperty('--display-pseudo', 'inline');
+  } else {
+    e.target.style.setProperty('--display-pseudo', 'none');
+  }
+});
+
+editHeader.addEventListener('blur', (e) => {
+      e.target.style.setProperty('--display-pseudo', 'none');
+});
 
 
   editHeader.addEventListener('keyup', () => {
@@ -189,25 +198,22 @@ function modifHeader(container) {
       e.preventDefault();
       const nextElement = container.nextElementSibling;
       if (nextElement) {
-        nextElement.querySelector('.editHeader').focus();
-      } 
+        nextElement.focus();
+      } else return
     }
 
     if (e.code === 'Backspace') {
       const prevElement = container.previousElementSibling;
       if (prevElement?.classList.contains('topics')) {
         if (e.target.textContent.trim().length === 0 || caretPosition === 0) {
-          prevElement.querySelector('.editHeader').focus();
-          moveCaretToEnd(prevElement);
+          prevElement.focus();
         }
       }
+
     }
     
   });
 
-  editHeader.addEventListener('select', (e) => {
-    // nothing
-  })
 
   function togglePlaceholder(editable) {
     if (!editable.textContent.trim()) {
@@ -223,14 +229,20 @@ function modifHeader(container) {
 
 
 
-function addNewTextContainer() {
-  const newElement = document.createRange().createContextualFragment(templateElement);
-  document.querySelector('.mainContainer').appendChild(newElement);
-  addEventListeners(document.querySelector('.mainContainer').lastElementChild);
-  const editable = document.querySelector('.mainContainer').lastElementChild.querySelector('.editable')
-  editable.focus();
-  editable.classList.add('no-before')
+function addNewTextContainer(currentElement) {
+  const newElement = document.createRange().createContextualFragment(templateElement).firstElementChild;
+  if (!newElement) return; // Prevents errors if templateElement is invalid
+
+  currentElement.insertAdjacentElement('afterend', newElement);
+  addEventListeners(newElement);
+
+  if (newElement.focus) {
+    newElement.focus(); // Ensure it's focusable
+  }
+
+  newElement.classList.add('no-before');
 }
+
 
 function getPosition(element) {
   var rect = element.getBoundingClientRect();
@@ -272,5 +284,5 @@ function caretUtils(editable) {
 
 
 
-document.querySelectorAll('.textContainer').forEach(addEventListeners);
+document.querySelectorAll('.editable').forEach(addEventListeners);
 document.querySelectorAll('.topics').forEach(modifHeader)
