@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@100..900&display=swap" rel="stylesheet">
 </head>
 
 <body >
@@ -16,24 +17,21 @@
 
   <div class='main '>
     <div class='mainContainer '>
-      <div class='header' >
-        <div class="topics" >
-          <h1 dir='auto' contentEditable='true' class="title editHeader  blinking-caret" data-placeholder="Title" ></h1>
-        </div>
-        <div class="topics">
-          <p dir='auto' contentEditable='true' class="author editHeader  blinking-caret" data-placeholder="Author"></p>
-        </div>
-      </div>
-      <div class='textContainer'>
-        <div dir='auto' class="editable blinking-caret" data-placeholder="Type here..."></div>
-      </div>
+          <h1 dir='auto' contentEditable='true' class="title topics noto-sans-georgian-400 editHeader " data-placeholder="Title" >
+            <!-- &nbsp; -->
+          </h1>
+          <p dir='auto' contentEditable='true' class="author topics noto-sans-georgian-400 editHeader  " data-placeholder="Your name">
+            <!-- &nbsp; -->
+          </p>
+          <div dir='auto' class="editable  " data-placeholder="Your story..."  contenteditable="true"></div>
+
     </div>
     <div class='itemsFunc'>container with items</div>
-  </div>
-  <div class='buttonsContainer'>
-    <div class="account account_top">Ulugbek N</div>
-    <button class='save hide'> edit </button>
-    <button class='publish ssss'> Publish </button>
+    <div class='buttonsContainer '>
+      <div class="account account_top  noto-sans-georgian-400">Ulugbek N</div>
+      <button class='save hide noto-sans-georgian-600'> edit </button>
+      <button class='publish  noto-sans-georgian-600'> Publish </button>
+    </div>
   </div>
 </div>
 
