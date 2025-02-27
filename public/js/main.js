@@ -1,254 +1,246 @@
-const title = document.querySelector('.title')
-const author = document.querySelector('.author')
-
-
-
-
-
+const title = document.querySelector(".title");
+const author = document.querySelector(".author");
 
 const templateElement = `
 <div class="editable" dir='auto' contenteditable=true  ></div>
-`
+`;
 
 function addEventListeners(container) {
-  const saveButton = document.querySelector('.save');
-  const publishButton = document.querySelector('.publish');
-  const itemsFunc = document.querySelector('.itemsFunc');
-  const main = document.querySelector('.main')
-  const mainContainer = document.querySelector('.mainContainer')
+  const saveButton = document.querySelector(".save");
+  const publishButton = document.querySelector(".publish");
+  const itemsFunc = document.querySelector(".itemsFunc");
+  const main = document.querySelector(".main");
+  const mainContainer = document.querySelector(".mainContainer");
   const editable = container;
   let caretPosition = null;
-  const placeholder = editable.getAttribute('data-placeholder')
-  let innerLength = 0; 
-
+  const placeholder = editable.getAttribute("data-placeholder");
+  let innerLength = 0;
 
   editable.setAttribute("contenteditable", "true");
 
   if (saveButton && publishButton) {
-    saveButton.addEventListener('click', () => {
+    saveButton.addEventListener("click", () => {
       editable.setAttribute("contenteditable", "true");
       editable.focus();
-      // caretUtils(editable).setCaret()
-      saveButton.classList.toggle('hide');
-      publishButton.classList.toggle('hide');
+      caretUtils(editable).setCaret()
+      saveButton.classList.toggle("hide");
+      publishButton.classList.toggle("hide");
     });
 
-    publishButton.addEventListener('click', () => {
+    publishButton.addEventListener("click", () => {
       editable.setAttribute("contenteditable", "false");
-      saveButton.classList.toggle('hide');
-      publishButton.classList.toggle('hide');
+      saveButton.classList.toggle("hide");
+      publishButton.classList.toggle("hide");
     });
   }
 
-  editable.addEventListener('focus', () => {
-    if(editable.textContent.trim().length >= 1) {
-      
-      editable.removeAttribute('data-placeholder-visible');
+  editable.addEventListener("focus", () => {
+    if (editable.textContent.trim().length >= 1) {
+      editable.removeAttribute("data-placeholder-visible");
     }
-    if (saveButton.classList.contains('hide')) {
+    if (saveButton.classList.contains("hide")) {
       const mainLeft = getPosition(mainContainer).x;
+      const editableTop = getPosition(editable).y;
+      const editableHeight = editable.offsetHeight;
+      const itemsHeight = itemsFunc.offsetHeight;
+      const centeredTop = editableTop + editableHeight / 2 - itemsHeight / 2;
       const itemsWidth = itemsFunc.offsetWidth;
-      itemsFunc.style.left = `${mainLeft - itemsWidth}px`;
-      itemsFunc.style.top = `${getPosition(container).y + window.scrollY + container.getBoundingClientRect().height / 2 - itemsFunc.getBoundingClientRect().height / 2}px`;
+      let leftPosition;
 
+      if (window.innerWidth < 960) {
+        leftPosition = (window.innerWidth - itemsWidth) / 2;
+      } else {
+        leftPosition = mainLeft - itemsWidth;
+      }
+
+      itemsFunc.style.opacity = "1";
+      itemsFunc.style.left = `${leftPosition}px`;
+      itemsFunc.style.top = `${centeredTop + window.scrollY}px`;
     }
   });
-  editable.addEventListener('input', (e) => {
-    innerLength = editable.textContent - 1
-  })
-
-  editable.addEventListener('keyup', () => {
-    caretPosition = caretUtils(editable).getCaret()
-  })
-
-  editable.addEventListener('blur', () => {
-    updateItemsFuncPosition()
-    togglePlaceholder(editable)
+  editable.addEventListener("input", (e) => {
+    const isEmpty = editable.textContent.trim().length === 0;
+    if (!isEmpty) {
+      itemsFunc.style.opacity = "0";
+      editable.removeAttribute("data-placeholder-visible");
+    } else {
+      itemsFunc.style.opacity = "1";
+      togglePlaceholder(editable);
+    }
   });
 
+  editable.addEventListener("keyup", () => {
+    caretPosition = caretUtils(editable).getCaret();
+  });
 
+  editable.addEventListener("blur", () => {
+    updateItemsFuncPosition();
+    togglePlaceholder(editable);
+  });
 
-  editable.addEventListener('keydown', (e) => {
-    if (e.code === 'Enter') {
+  editable.addEventListener("keydown", (e) => {
+    if (e.code === "Enter") {
       e.preventDefault();
       const nextElement = container.nextElementSibling;
       if (nextElement) {
         nextElement.focus();
-        // caretUtils(nextElement).setCaret(nextElement)
+        caretUtils(nextElement).setCaret()
       } else {
-        addNewTextContainer();
-
+        addNewTextContainer(e.target);
       }
     }
 
-    if (e.code === 'Backspace' && e.target.textContent.trim().length === 0) {
-      const prevElement = container.previousElementSibling;
-      if (prevElement ) {
-        prevElement.focus();
-        // caretUtils(prevElement).setCaret(prevElement) 
-        if(prevElement.classList.contains('editable')) e.target.remove()
-      } else {
-        return
-      }
-    } else if (e.code === 'Backspace' && caretPosition === 0) {
+    if (e.code === "Backspace" && e.target.textContent.trim().length === 0) {
       const prevElement = container.previousElementSibling;
       if (prevElement) {
         prevElement.focus();
-        // caretUtils(prevElement).setCaret(prevElement)
+        caretUtils(prevElement).setCaret()
+        if (prevElement.classList.contains("editable")) e.target.remove();
+      } else {
+        return;
+      }
+    } else if (e.code === "Backspace" && caretPosition === 0) {
+      const prevElement = container.previousElementSibling;
+      if (prevElement) {
+        prevElement.focus();
+        caretUtils(prevElement).setCaret()
       }
     }
   });
 
-  editable.addEventListener('input', (e) => {
+  editable.addEventListener("input", (e) => {
     togglePlaceholder(editable);
-    innerLength = e.target.innerText - 1
   });
 
-
-
-
-
   function updateItemsFuncPosition() {
-    const mainLeft = getPosition(mainContainer).x;
-    const itemsWidth = itemsFunc.offsetWidth;
-    itemsFunc.style.left = `${mainLeft + itemsWidth}px`;
-    itemsFunc.style.top = `${itemsFunc.style.top = `${getPosition(container).y + container.getBoundingClientRect().height / 2 - itemsFunc.getBoundingClientRect().height / 2}px`}`
-
-
+    itemsFunc.style.opacity = "0";
   }
 
-
   function togglePlaceholder(editable) {
-    
-      if (!editable.textContent.trim()) {
-        editable.setAttribute('data-placeholder-visible', true)
-        
-      } else {
-        editable.removeAttribute('data-placeholder-visible')
-      }
-    
+    if (!editable.textContent.trim()) {
+      editable.setAttribute("data-placeholder-visible", true);
+    } else {
+      editable.removeAttribute("data-placeholder-visible");
+    }
   }
 
   updateItemsFuncPosition();
-  togglePlaceholder(editable)
-  window.addEventListener('resize', updateItemsFuncPosition);
-
+  togglePlaceholder(editable);
+  window.addEventListener("resize", updateItemsFuncPosition);
 }
 
-
 function modifHeader(container) {
-  const saveButton = document.querySelector('.save');
-  const publishButton = document.querySelector('.publish');
-  
-  const editHeader = container
-  
+  const saveButton = document.querySelector(".save");
+  const publishButton = document.querySelector(".publish");
+
+  const editHeader = container;
+
   let caretPosition = null;
 
   editHeader.setAttribute("contenteditable", "true");
 
   if (saveButton && publishButton) {
-    saveButton.addEventListener('click', () => {
+    saveButton.addEventListener("click", () => {
       editHeader.setAttribute("contenteditable", "true");
-      saveButton.classList.toggle('hide');
-      publishButton.classList.toggle('hide');
+      saveButton.classList.toggle("hide");
+      publishButton.classList.toggle("hide");
     });
 
-    publishButton.addEventListener('click', () => {
+    publishButton.addEventListener("click", () => {
       editHeader.setAttribute("contenteditable", "false");
-      saveButton.classList.toggle('hide');
-      publishButton.classList.toggle('hide');
+      saveButton.classList.toggle("hide");
+      publishButton.classList.toggle("hide");
     });
   }
 
-  editHeader.addEventListener('input', (e) => {
+  editHeader.addEventListener("input", (e) => {
     const isEmpty = editHeader.textContent.trim().length === 0;
 
     if (!isEmpty) {
-        editHeader.removeAttribute('data-placeholder-visible');
+      editHeader.removeAttribute("data-placeholder-visible");
     } else {
-        togglePlaceholder(editHeader);
+      togglePlaceholder(editHeader);
     }
 
-    editHeader.style.setProperty('--display-pseudo', isEmpty ? 'none' : 'inline');
-});
-
-editHeader.addEventListener('focus', (e) => {
-  if(e.target.textContent.trim().length > 0) {
-    e.target.style.setProperty('--display-pseudo', 'inline');
-  } else {
-    e.target.style.setProperty('--display-pseudo', 'none');
-  }
-});
-
-editHeader.addEventListener('blur', (e) => {
-      e.target.style.setProperty('--display-pseudo', 'none');
-});
-
-
-  editHeader.addEventListener('keyup', () => {
-    caretPosition = caretUtils(editHeader).getCaret()
-  })
-
-  editHeader.addEventListener('blur', () => {
-    togglePlaceholder(editHeader)
+    editHeader.style.setProperty(
+      "--display-pseudo",
+      isEmpty ? "none" : "inline"
+    );
   });
 
-  editHeader.addEventListener('keydown', (e) => {
-    if (e.code === 'Enter') {
+  editHeader.addEventListener("focus", (e) => {
+    if (e.target.textContent.trim().length > 0) {
+      e.target.style.setProperty("--display-pseudo", "inline");
+    } else {
+      e.target.style.setProperty("--display-pseudo", "none");
+    }
+  });
+
+  editHeader.addEventListener("blur", (e) => {
+    e.target.style.setProperty("--display-pseudo", "none");
+  });
+
+  editHeader.addEventListener("keyup", () => {
+    caretPosition = caretUtils(editHeader).getCaret();
+  });
+
+  editHeader.addEventListener("blur", () => {
+    togglePlaceholder(editHeader);
+  });
+
+  editHeader.addEventListener("keydown", (e) => {
+    if (e.code === "Enter") {
       e.preventDefault();
       const nextElement = container.nextElementSibling;
       if (nextElement) {
+        caretUtils(nextElement).setCaret()
         nextElement.focus();
-      } else return
+      } else return;
     }
 
-    if (e.code === 'Backspace') {
+    if (e.code === "Backspace") {
       const prevElement = container.previousElementSibling;
-      if (prevElement?.classList.contains('topics')) {
+      if (prevElement?.classList.contains("topics")) {
         if (e.target.textContent.trim().length === 0 || caretPosition === 0) {
           prevElement.focus();
+          caretUtils(prevElement).setCaret()
         }
       }
-
     }
-    
   });
-
 
   function togglePlaceholder(editable) {
     if (!editable.textContent.trim()) {
-      editable.setAttribute('data-placeholder-visible', true)
-  
+      editable.setAttribute("data-placeholder-visible", true);
     } else {
-      editable.removeAttribute('data-placeholder-visible')
+      editable.removeAttribute("data-placeholder-visible");
     }
   }
-  togglePlaceholder(editHeader)
-
+  togglePlaceholder(editHeader);
 }
 
-
-
 function addNewTextContainer(currentElement) {
-  const newElement = document.createRange().createContextualFragment(templateElement).firstElementChild;
-  if (!newElement) return; // Prevents errors if templateElement is invalid
+  const newElement = document
+    .createRange()
+    .createContextualFragment(templateElement).firstElementChild;
+  if (!newElement) return;
 
-  currentElement.insertAdjacentElement('afterend', newElement);
+  currentElement.insertAdjacentElement("afterend", newElement);
   addEventListeners(newElement);
 
   if (newElement.focus) {
-    newElement.focus(); // Ensure it's focusable
+    newElement.focus();
+    caretUtils(newElement).setCaret()
   }
 
-  newElement.classList.add('no-before');
+  newElement.classList.add("no-before");
 }
-
 
 function getPosition(element) {
   var rect = element.getBoundingClientRect();
   return {
-    x: rect.left,
-    y: rect.top
+    x: rect.left + window.scrollX,
+    y: rect.top + window.scrollY,
   };
 }
 
@@ -263,26 +255,19 @@ function caretUtils(editable) {
       preCaretRange.selectNodeContents(editable);
       preCaretRange.setEnd(range.endContainer, range.endOffset);
 
-      return preCaretRange.toString().length; 
+      return preCaretRange.toString().length;
     },
 
     setCaret: function () {
-      // const range = document.createRange();
-      //   const selection = window.getSelection();
-      //   range.setStart(editable, editable.childNodes.length);
-      //   range.collapse(true);
-      //   selection.removeAllRanges();
-      //   selection.addRange(range);
-        console.log('we have not solved this yet')
-      
-      
+      const range = document.createRange();
+      range.selectNodeContents(editable);
+      range.collapse(false); // collapse to the end
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
     },
   };
 }
 
-
-
-
-
-document.querySelectorAll('.editable').forEach(addEventListeners);
-document.querySelectorAll('.topics').forEach(modifHeader)
+document.querySelectorAll(".editable").forEach(addEventListeners);
+document.querySelectorAll(".topics").forEach(modifHeader);
