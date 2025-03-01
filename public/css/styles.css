@@ -9,7 +9,8 @@
 
 :root {
   --display-pseudo: none;
-  --after-color: #00000026;
+  --after-color-title:rgba(0, 0, 0, 0.44);
+  --after-color-author:rgba(0, 0, 0, 0.44);
 }
 
 
@@ -88,23 +89,44 @@ body {
 
 
 
-.editable:empty::before,
+.editable:empty:before,
 .title:empty:before,
 .author:empty:before {
   content: attr(data-placeholder);
-  color: #aaa;
   font-weight: light;
   pointer-events: none;
   min-width: 1px;
 }
 
+.editable:empty:before {
+  color: rgba(0, 0, 0, .44);
+}
+
+.title:empty:before {
+  color: var(--after-color-title);
+}
+.author:empty:before {
+  color: var(--after-color-author);
+}
+
 .editable[data-placeholder-visible]::before, 
-.editHeader[data-placeholder-visible]::before {
+.title[data-placeholder-visible]::before ,
+.author[data-placeholder-visible]::before {
   content: attr(data-placeholder);
-  color: #aaa; 
   pointer-events: none; 
   min-width: 1px;
 }
+
+.editable[data-placeholder-visible]::before{
+  color: rgba(0, 0, 0, .44);
+}
+.title[data-placeholder-visible]::before {
+  color: var(--after-color-title)
+}
+.author[data-placeholder-visible]::before{
+  color: var(--after-color-author)
+}
+
 
 
 
@@ -163,7 +185,6 @@ body {
   color: rgba(0, 0, 0, .44);
   font-weight: 200 !important;
   position: absolute;
-  color: rgba(0, 0, 0, .44);
   border-right: 1px solid rgba(0, 0, 0, .15);
   right: 100%;
   top: -6px;

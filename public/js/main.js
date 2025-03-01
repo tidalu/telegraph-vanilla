@@ -9,12 +9,9 @@ function addEventListeners(container) {
   const saveButton = document.querySelector(".save");
   const publishButton = document.querySelector(".publish");
   const itemsFunc = document.querySelector(".itemsFunc");
-  const main = document.querySelector(".main");
   const mainContainer = document.querySelector(".mainContainer");
   const editable = container;
   let caretPosition = null;
-  const placeholder = editable.getAttribute("data-placeholder");
-  let innerLength = 0;
 
   editable.setAttribute("contenteditable", "true");
 
@@ -28,10 +25,41 @@ function addEventListeners(container) {
     });
 
     publishButton.addEventListener("click", () => {
-      editable.setAttribute("contenteditable", "false");
-      saveButton.classList.toggle("hide");
-      publishButton.classList.toggle("hide");
+      try {
+        let isTitleEmpty = title.innerText.trim().length === 0;
+        let isAuthorEmpty = author.innerText.trim().length === 0;
+      
+        if (isTitleEmpty) {
+          title.focus();
+          title.style.setProperty("--after-color-title", "red");
+          console.log("Title is empty, color set to red.");
+        }
+      
+        if (isAuthorEmpty) {
+          author.focus();
+          author.style.setProperty("--after-color-author", "red");
+          console.log("Author is empty, color set to red.");
+        }
+      
+        // Only proceed with the else block if both title and author are non-empty
+        if (!isTitleEmpty && !isAuthorEmpty) {
+          // Reset colors if both fields are filled
+          author.style.setProperty("--after-color-author", "rgba(0, 0, 0, 0.8)");
+          title.style.setProperty("--after-color-title", "rgba(0, 0, 0, 0.8)");
+      
+          // Lock the editable field and toggle the button visibility
+          editable.setAttribute("contenteditable", "false");
+          console.log('falsen');
+          saveButton.classList.toggle("hide");
+          publishButton.classList.toggle("hide");
+          console.log("Title and Author are both filled. Editing locked.");
+        }
+      } catch (error) {
+        console.error("An error occurred during the publish process:", error);
+      }
+      
     });
+    
   }
 
   editable.addEventListener("focus", () => {
@@ -147,9 +175,39 @@ function modifHeader(container) {
     });
 
     publishButton.addEventListener("click", () => {
-      editHeader.setAttribute("contenteditable", "false");
-      saveButton.classList.toggle("hide");
-      publishButton.classList.toggle("hide");
+      try {
+        let isTitleEmpty = title.innerText.trim().length === 0;
+        let isAuthorEmpty = author.innerText.trim().length === 0;
+      
+        if (isTitleEmpty) {
+          title.focus();
+          title.style.setProperty("--after-color-title", "red");
+          console.log("Title is empty, color set to red.");
+        }
+      
+        if (isAuthorEmpty) {
+          author.focus();
+          author.style.setProperty("--after-color-author", "red");
+          console.log("Author is empty, color set to red.");
+        }
+      
+        // Only proceed with the else block if both title and author are non-empty
+        if (!isTitleEmpty && !isAuthorEmpty) {
+          // Reset colors if both fields are filled
+          author.style.setProperty("--after-color-author", "rgba(0, 0, 0, 0.8)");
+          title.style.setProperty("--after-color-title", "rgba(0, 0, 0, 0.8)");
+      
+          // Lock the editable field and toggle the button visibility
+          editable.setAttribute("contenteditable", "false");
+          console.log('falsen');
+          saveButton.classList.toggle("hide");
+          publishButton.classList.toggle("hide");
+          console.log("Title and Author are both filled. Editing locked.");
+        }
+      } catch (error) {
+        console.error("An error occurred during the publish process:", error);
+      }
+      
     });
   }
 
@@ -261,7 +319,7 @@ function caretUtils(editable) {
     setCaret: function () {
       const range = document.createRange();
       range.selectNodeContents(editable);
-      range.collapse(false); // collapse to the end
+      range.collapse(false);
       const selection = window.getSelection();
       selection.removeAllRanges();
       selection.addRange(range);
