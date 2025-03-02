@@ -19,7 +19,7 @@ function addEventListeners(container) {
     saveButton.addEventListener("click", () => {
       editable.setAttribute("contenteditable", "true");
       editable.focus();
-      caretUtils(editable).setCaret()
+      caretUtils(editable).setCaret();
       saveButton.classList.toggle("hide");
       publishButton.classList.toggle("hide");
     });
@@ -28,28 +28,31 @@ function addEventListeners(container) {
       try {
         let isTitleEmpty = title.innerText.trim().length === 0;
         let isAuthorEmpty = author.innerText.trim().length === 0;
-      
+
         if (isTitleEmpty) {
           title.focus();
           title.style.setProperty("--after-color-title", "red");
           console.log("Title is empty, color set to red.");
         }
-      
+
         if (isAuthorEmpty) {
           author.focus();
           author.style.setProperty("--after-color-author", "red");
           console.log("Author is empty, color set to red.");
         }
-      
+
         // Only proceed with the else block if both title and author are non-empty
         if (!isTitleEmpty && !isAuthorEmpty) {
           // Reset colors if both fields are filled
-          author.style.setProperty("--after-color-author", "rgba(0, 0, 0, 0.8)");
-          title.style.setProperty("--after-color-title", "rgba(0, 0, 0, 0.8)");
-      
+          author.style.setProperty(
+            "--after-color-author",
+            "rgba(0, 0, 0, 0.4)"
+          );
+          title.style.setProperty("--after-color-title", "rgba(0, 0, 0, 0.4)");
+
           // Lock the editable field and toggle the button visibility
           editable.setAttribute("contenteditable", "false");
-          console.log('falsen');
+          console.log("falsen");
           saveButton.classList.toggle("hide");
           publishButton.classList.toggle("hide");
           console.log("Title and Author are both filled. Editing locked.");
@@ -57,9 +60,7 @@ function addEventListeners(container) {
       } catch (error) {
         console.error("An error occurred during the publish process:", error);
       }
-      
     });
-    
   }
 
   editable.addEventListener("focus", () => {
@@ -80,10 +81,11 @@ function addEventListeners(container) {
       } else {
         leftPosition = mainLeft - itemsWidth;
       }
-
-      itemsFunc.style.opacity = "1";
-      itemsFunc.style.left = `${leftPosition}px`;
-      itemsFunc.style.top = `${centeredTop + window.scrollY}px`;
+      if (editable.innerText.trim().length <= 0) {
+        itemsFunc.style.opacity = "1";
+        itemsFunc.style.left = `${leftPosition}px`;
+        itemsFunc.style.top = `${centeredTop + window.scrollY}px`;
+      }
     }
   });
   editable.addEventListener("input", (e) => {
@@ -112,7 +114,7 @@ function addEventListeners(container) {
       const nextElement = container.nextElementSibling;
       if (nextElement) {
         nextElement.focus();
-        caretUtils(nextElement).setCaret()
+        caretUtils(nextElement).setCaret();
       } else {
         addNewTextContainer(e.target);
       }
@@ -122,7 +124,7 @@ function addEventListeners(container) {
       const prevElement = container.previousElementSibling;
       if (prevElement) {
         prevElement.focus();
-        caretUtils(prevElement).setCaret()
+        caretUtils(prevElement).setCaret();
         if (prevElement.classList.contains("editable")) e.target.remove();
       } else {
         return;
@@ -131,7 +133,7 @@ function addEventListeners(container) {
       const prevElement = container.previousElementSibling;
       if (prevElement) {
         prevElement.focus();
-        caretUtils(prevElement).setCaret()
+        caretUtils(prevElement).setCaret();
       }
     }
   });
@@ -178,28 +180,31 @@ function modifHeader(container) {
       try {
         let isTitleEmpty = title.innerText.trim().length === 0;
         let isAuthorEmpty = author.innerText.trim().length === 0;
-      
+
         if (isTitleEmpty) {
           title.focus();
           title.style.setProperty("--after-color-title", "red");
           console.log("Title is empty, color set to red.");
         }
-      
+
         if (isAuthorEmpty) {
           author.focus();
           author.style.setProperty("--after-color-author", "red");
           console.log("Author is empty, color set to red.");
         }
-      
+
         // Only proceed with the else block if both title and author are non-empty
         if (!isTitleEmpty && !isAuthorEmpty) {
           // Reset colors if both fields are filled
-          author.style.setProperty("--after-color-author", "rgba(0, 0, 0, 0.8)");
-          title.style.setProperty("--after-color-title", "rgba(0, 0, 0, 0.8)");
-      
+          author.style.setProperty(
+            "--after-color-author",
+            "rgba(0, 0, 0, 0.4)"
+          );
+          title.style.setProperty("--after-color-title", "rgba(0, 0, 0, 0.4)");
+
           // Lock the editable field and toggle the button visibility
           editable.setAttribute("contenteditable", "false");
-          console.log('falsen');
+          console.log("falsen");
           saveButton.classList.toggle("hide");
           publishButton.classList.toggle("hide");
           console.log("Title and Author are both filled. Editing locked.");
@@ -207,11 +212,13 @@ function modifHeader(container) {
       } catch (error) {
         console.error("An error occurred during the publish process:", error);
       }
-      
     });
   }
 
   editHeader.addEventListener("input", (e) => {
+    author.style.setProperty("--after-color-author", "rgba(0, 0, 0, 0.4)");
+    title.style.setProperty("--after-color-title", "rgba(0, 0, 0, 0.4)");
+
     const isEmpty = editHeader.textContent.trim().length === 0;
 
     if (!isEmpty) {
@@ -251,7 +258,7 @@ function modifHeader(container) {
       e.preventDefault();
       const nextElement = container.nextElementSibling;
       if (nextElement) {
-        caretUtils(nextElement).setCaret()
+        caretUtils(nextElement).setCaret();
         nextElement.focus();
       } else return;
     }
@@ -261,7 +268,7 @@ function modifHeader(container) {
       if (prevElement?.classList.contains("topics")) {
         if (e.target.textContent.trim().length === 0 || caretPosition === 0) {
           prevElement.focus();
-          caretUtils(prevElement).setCaret()
+          caretUtils(prevElement).setCaret();
         }
       }
     }
@@ -288,7 +295,7 @@ function addNewTextContainer(currentElement) {
 
   if (newElement.focus) {
     newElement.focus();
-    caretUtils(newElement).setCaret()
+    caretUtils(newElement).setCaret();
   }
 
   newElement.classList.add("no-before");
